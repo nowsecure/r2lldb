@@ -1,0 +1,34 @@
+# r2lldb script for OSX
+e asm.os=darwin
+e asm.arch=x86
+e asm.bits=64
+e asm.cmtcol=50
+e asm.bytes=false
+e key.f6=$s
+e key.f7=$so
+(regs,.=!dr*,.dr*)
+(step,=!ds,.=!dr*,.dr*)
+"$s=.(step) 2>/dev/null"
+"$so==!dso;.(regs)"
+$r=.(regs)
+$b==!db
+$bt==!dbt
+$m==!dm
+$c==!dc
+$c==!dc
+$v==!dfv
+$t==!dt
+$ta==!dta
+# Load stuff
+?e [r2lldb] Loading symbols...
+.=!is
+?e [r2lldb] Loading registers...
+.=!dr*
+.dr*
+sr pc
+"e key.s=$s;$r"
+pid 18
+$b `?v $$+0xa`
+$t `?v $$+0xa`
+$b `?v $$+0x15`
+=!dct
