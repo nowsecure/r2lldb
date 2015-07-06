@@ -10,6 +10,7 @@ from backend.lldb import dbg
 from backend import trace
 import traceback
 import r2pipe
+import sys
 import re
 
 def rap(debugger, command, result, dict):

@@ -1,4 +1,4 @@
 platform select remote-ios
-process connect connect://192.168.1.34:1234
+process connect connect://127.0.0.1:60109
 command script import main.py
 quit
