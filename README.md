@@ -41,18 +41,28 @@ Example
 
 Target:
 
+	$ r2lldb -l 1234 /bin/ls
+
+	or
+
 	$ while : ; do debugserver *:1234 /bin/ls ; done
 	Listening to port 1234 for a connection from *...
 	Got a connection, launched process /bin/ls (pid = 82363).
 
 Host: Terminal 1
 
-	$ while : ; do lldb -s lldb-local.rc ; done
+	$ r2lldb -c :1234
+
+	$ while : ; do lldb -s lldb/local ; done
 	Listening for r2rap connections at port 9999
 
 Host: Terminal 2
 
-	r2 -i r2-iphone.rc rap://localhost:9999//
+	$ r2lldb -r ios localhost:9999
+
+	or
+
+	$ r2 -i r2/ios rap://localhost:9999//
 
 r2lldb's help from r2
 ---------------------

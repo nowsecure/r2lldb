@@ -8,6 +8,7 @@
 from r2rap import RapServer
 from backend.lldb import dbg
 from backend import trace
+import exceptions
 import traceback
 import r2pipe
 import sys
@@ -27,8 +28,14 @@ def rap(debugger, command, result, dict):
 			return dbg.cmd("print $environ")
 		elif c[0:7] == "dlopen ":
 			return dbg.dlopen(a[7:].strip())
+		elif c[0:2] == "o ":
+			return dbg.cmd("target create %s"%c[2:])
+		elif c[0] == "o":
+			return "TODO: show target"
 		elif c == "objc":
 			return dbg.objcListClasses()
+		elif c == "run":
+			return dbg.cmd("run");
 		elif c == "dc":
 			return dbg.cont()
 		elif c == "ds":
@@ -234,15 +241,30 @@ def rap(debugger, command, result, dict):
 	rs.handle_seek = __seek
 	rs.listen_tcp (port)
 
+import signal
+import sys
+def signal_handler(signal, frame):
+        print('')
+	# TODO: close rap server here
+        sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
+#signal.pause()
+
 PORT = "9999"
+
 # sys.argv not defined inside lldbb
-try:
-	rap(0, PORT, "", "")
-except:
-	print "Unexpected error:", sys.exc_info()[0]
-	print("Rap exception cannot listen")
+def main():
+	try:
+		rap(0, PORT, "", "")
+	except exceptions.SystemExit:
+		pass
+	except:
+		print "Unexpected error:", sys.exc_info()[0]
+		print("Rap exception cannot listen")
 
 # Register r2rap command in the lldb shell
 #def __lldb_init_module (debugger, dict):
 #	debugger.HandleCommand('command script add -f main.rap r2rap')
 	#print 'The r2rap command has been installed'
+
+main()

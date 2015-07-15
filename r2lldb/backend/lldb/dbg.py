@@ -1,4 +1,10 @@
-import lldb
+try:
+	import lldb
+except:
+	print
+	print "ERROR: import lldb only works in the lldb shell"
+	print
+	raise
 
 # (lldb) process launch --stop-at-entry -- -program_arg value 
 
