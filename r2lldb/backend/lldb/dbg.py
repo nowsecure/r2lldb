@@ -134,6 +134,21 @@ def read(addr, size):
 		i = i + bs 
 	return data
 
+def write(addr, buf):
+	i = 0
+	data = ''
+	target = lldb.debugger.GetSelectedTarget()
+	error = lldb.SBError()
+	res = target.process.WriteMemory (addr+i, buf, error)
+	#if not error.Success() or res != 1:
+	print ("RES")
+	print (res)
+	if res == 0:
+		print(error)
+		print ("WRITE FAIL AT 0x%x"%(addr+i))
+		return 0
+	return size
+
 #[ 99] 29886CD7-2AC8-3578-8389-7D5BEE405F53 0x08a38000 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/PrivateFrameworks/FaceCore.framework/FaceCore 
 
 def maps():
@@ -257,6 +272,7 @@ def symbols():
 def stop():
 	cmd("process interrupt")
 
+print ("")
 print ("Running r2lldb script...")
 
 #print(backtrace())

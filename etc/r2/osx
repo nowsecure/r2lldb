@@ -26,9 +26,9 @@ $ta==!dta
 .=!dr*
 .dr*
 sr pc
-"e key.s=$s;$r"
-pid 18
-$b `?v $$+0xa`
-$t `?v $$+0xa`
-$b `?v $$+0x15`
-=!dct
+# "e key.s=$s;$r"
+# pid 18
+# $b `?v $$+0xa`
+# $t `?v $$+0xa`
+# $b `?v $$+0x15`
+# =!dct

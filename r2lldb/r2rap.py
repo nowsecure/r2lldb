@@ -61,8 +61,8 @@ class RapServer():
 		self.fd = c
 		ret = ""
 		if key == RAP_OPEN:
-			buffer = c.recv(2)
-			(flags, length) = unpack(">BB", buffer)
+			buf = c.recv(2)
+			(flags, length) = unpack(">BB", buf)
 			file = c.recv(length)
 			if self.handle_open != None:
 				fd = self.handle_open(file, flags)
@@ -70,8 +70,8 @@ class RapServer():
 			buf = pack(">Bi", key|RAP_REPLY, fd)
 			c.send(buf)
 		elif key == RAP_READ:
-			buffer = c.recv(4)
-			(length,) = unpack(">I", buffer)
+			buf = c.recv(4)
+			(length,) = unpack(">I", buf)
 			if self.handle_read != None:
 				ret = str(self.handle_read(length))
 				try:
@@ -85,17 +85,25 @@ class RapServer():
 			buf = pack(">Bi", key|RAP_REPLY, lon)
 			c.send(buf+ret)
 		elif key == RAP_WRITE:
-			buffer = c.recv(4)
-			(length,) = unpack(">I", buffer)
-			buffer = c.recv(length)
-			# TODO: get buffer and length
-			if self.handle_write != None:
-				length = self.handle_write (buffer)
-			buf = pack(">Bi", key|RAP_REPLY, length)
-			c.send(buf)
+			buf = c.recv(4)
+			(length,) = unpack(">I", buf)
+			buf = c.recv(length)
+			print ("HANDLE WRITE %d"%key)
+			print ("HANDLE WRITE %d"%len(buf))
+			# TODO: get buf and length
+			try:
+				if self.handle_write != None:
+					length = self.handle_write (buf)
+				buf = pack(">Bi", key|RAP_REPLY, length)
+				c.send(buf)
+			except:
+				print sys.exc_info()
+				print "ERROR"
+				buf = pack(">Bi", key|RAP_REPLY, 0)
+				c.send(buf)
 		elif key == RAP_SEEK:
-			buffer = c.recv(9)
-			(type, off) = unpack(">BQ", buffer)
+			buf = c.recv(9)
+			(type, off) = unpack(">BQ", buf)
 			seek = 0
 			if self.handle_seek != None:
 				seek = self.handle_seek(off, type)

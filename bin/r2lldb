@@ -1,0 +1,160 @@
+#!/bin/sh
+
+R2LLDB_VERSION="0.1"
+ME=`dirname $0`/r2lldb
+LN=`readlink $ME`
+if [ -n "${LN}" ]; then
+	CWD=`dirname ${LN}`/..
+else
+	CWD=`dirname ${ME}`/..
+fi
+
+Help() {
+	echo "Usage: r2lldb [-vh] [-l port] [[-p,-c] t] [-|pid|program|host:port]"
+	if [ -n "$1" ]; then
+		echo " -h          show this help message"
+		echo " -l [port]   start debugserver"
+		echo " -ll [port]  start debugserver forever"
+		echo " -p t [h:p]  proxy lldb-debugserver and listen for r2lldb" 
+		echo " -pp t [h:p] lldb->r2 like above, but forever" 
+		echo " -r t [h:p]  connect r2 to an r2lldb rap server (t=ios,osx)" 
+		echo " -v          show version information"
+		echo " -           python oneliner to run r2lldb server in lldb"
+		echo "Example:"
+		echo " target$ r2lldb -l 1234 /bin/ls"
+		echo " host$ r2lldb -p ios localhost:1234"
+		echo " host$ r2lldb -r ios localhost:999"
+		exit 0
+	fi
+	exit 1
+}
+
+ControlC() {
+	exit 1
+}
+
+DEBUGSERVER=""
+
+FindDebugServer() {
+	DEBUGSERVER="/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Resources/debugserver"
+	if [ -x "${DEBUGSERVER}" ]; then
+		return 0
+	fi
+	FS=:
+	for a in ${PATH} ; do
+		DEBUGSERVER="$a/debugserver"
+		if [ -x "${DEBUGSERVER}" ]; then
+			return 0
+		fi
+	done
+	DEBUGSERVER=""
+	return 1
+}
+
+case "$1" in
+'-v')
+	echo "${R2LLDB_VERSION}"
+	;;
+'-ll')
+	shift
+	while : ; do
+		$0 -l $*
+		sleep 1
+	done
+	;;
+'-l')
+	if [ -z "$2" ]; then
+		echo "Missing -l port"
+		exit 1
+	fi
+	if [ -z "$3" ]; then
+		echo "Missing bin"
+		exit 1
+	fi
+	FindDebugServer
+	if [ -z "${DEBUGSERVER}" ]; then
+		echo "Cannot find debugserver"
+	else
+		echo "LISTEN $2"
+		test "$3" -gt 0 > /dev/null 2>&1
+		if [ $? = 0 ]; then
+			echo "ATTACH $3"
+			${DEBUGSERVER} "*:$2" --attach="$3"
+		else
+			echo "LAUNCH $3"
+			echo ${DEBUGSERVER} "*:$2" "$3"
+			${DEBUGSERVER} "*:$2" "$3"
+		fi
+		if [ $? = 0 ]; then
+			echo "DebugServer error $?"
+		fi
+	fi
+	;;
+'-h')
+	Help 1
+	;;
+'-')
+	echo "script import sys;sys.path.append('${CWD}');import r2lldb"
+	echo or
+	echo "script import r2lldb"
+	;;
+'-pp')
+	shift
+	while : ; do
+		$0 -p $*
+		sleep 1
+	done
+	;;
+'-p')
+	trap ControlC 2
+	C="lldb"
+	case "$2" in
+	ios)
+		C="$C -o 'platform select remote-ios'"
+		;;
+	osx)
+		: # nothing
+		;;
+	*)
+		echo "Unknown remote target $2"
+		(cd $CWD/etc/lldb ; ls | cat)
+		exit 1
+		;;
+	esac
+	if [ -z "$3" ]; then
+		echo "Missing host:port to connect"
+		exit 1
+	else
+		C="$C -o 'process connect connect://"$3"'"
+	fi
+	C="$C -o 'command script import r2lldb' -o quit"
+	echo $C
+	eval $C
+	;;
+'-r')
+	echo "Launching r2 to connect to rap:// lldb"
+	if [ -z "$2" ]; then
+		echo "Missing argument. Use:"
+		(cd $CWD/etc/r2 ; ls | cat)
+		exit 1
+	fi
+	if [ -f "$CWD/etc/r2/$2" ]; then
+		r2 -wi "$CWD/etc/r2/$2" rap://"$3"//
+	else
+		r2 -wn rap://"$3"//
+	fi
+	;;
+'')
+	Help
+	;;
+*)
+	shift
+	if [ -n "`echo '$1' | grep :`" ]; then
+		echo "Connecting to remote lldb..."
+	else
+		echo "Open program: $* .."
+		lldb -s ${CWD}/etc/lldb/local $*
+	fi
+	exit 0
+	;;
+esac

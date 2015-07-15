@@ -224,6 +224,8 @@ def rap(debugger, command, result, dict):
 	rs = RapServer()
 	def __read(sz):
 		return dbg.read(rs.offset, sz)
+	def __write(buf):
+		return dbg.write(rs.offset, buf)
 	def __seek(off,when):
 		if when == 2:
 			return 0xffffffffffffffff
@@ -238,6 +240,7 @@ def rap(debugger, command, result, dict):
 	rs.handle_system = __cmd
 	rs.handle_cmd = __cmd
 	rs.handle_read = __read
+	rs.handle_write = __write
 	rs.handle_seek = __seek
 	rs.listen_tcp (port)
 
