@@ -192,10 +192,26 @@ def rap(debugger, command, result, dict):
 		elif c == "dcue":
 			return dbg.run_to_entry()
 		elif c == "dr=":
-			print("DREQ")
 			try:
 				s = "" + dbg.cmd("reg read")
-				s = s.replace("\n", "") + "\n"
+				nl = s.find("\n")
+				if nl != -1:
+					s = s[nl+1:]
+					res = ""
+					col = 0
+					while True:
+						nl = s.find("\n")
+						if nl == -1:
+							break
+						#s = s.replace("\n", "") + "\n"
+						line = s[0:nl]
+						col = col + 1
+						res = res + line
+						if col>1:
+							col = 0
+							res = res + "\n"
+						s = s[nl+1:]
+					s = res
 				#s = s.split("\n").join(" ")
 				return s #s.split("\n").join(" ") + "\n"
 			except:
