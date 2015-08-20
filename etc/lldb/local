@@ -1,0 +1,3 @@
+process launch --stop-at-entry
+script import r2lldb
+quit

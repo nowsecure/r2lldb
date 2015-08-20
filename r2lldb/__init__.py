@@ -7,6 +7,7 @@
 
 from r2rap import RapServer
 from backend.lldb import dbg
+from backend.lldb import loop
 from backend import trace
 import exceptions
 import traceback
@@ -14,9 +15,16 @@ import r2pipe
 import sys
 import re
 
+def run_script(file):
+	execfile(file)
+
 def rap(debugger, command, result, dict):
 	def r2cmd(c):
 		print ("_____(%s)___"%c)
+		if c[0:2] == ". ":
+			return run_script(c[2:])
+		if c[0] == ":":
+			return dbg.cmd(c[1:])
 		if c == "q":
 			print ("STOP")
 			rs.stop()
@@ -72,6 +80,19 @@ def rap(debugger, command, result, dict):
 			except:
 				return "Trace exception"
 			return ""
+		elif c == "dT":
+			return loop.listTracePoints()
+		elif c[0:3] == "dT ":
+			return loop.setTracePoint(c[4:])
+		elif c == "dT?":
+			return """Usage:
+ dT    list all debugloop traces
+ dT-   remove all tracepoints
+ dT A  add specific address for tracing
+ dTc   run/continue into the debugloop
+"""
+		elif c == "dTc":
+			return loop.runLoop()
 		elif c == "dt":
 			return trace.list()
 		elif c == "dcta":
@@ -170,6 +191,16 @@ def rap(debugger, command, result, dict):
 			return dbg.cmd("fr v") # -a
 		elif c == "dcue":
 			return dbg.run_to_entry()
+		elif c == "dr=":
+			print("DREQ")
+			try:
+				s = "" + dbg.cmd("reg read")
+				s = s.replace("\n", "") + "\n"
+				#s = s.split("\n").join(" ")
+				return s #s.split("\n").join(" ") + "\n"
+			except:
+				print "ERRER"
+				return "ERROR"
 		elif c == "dr":
 			return dbg.cmd('reg read')
 		elif c == "dra":
@@ -184,7 +215,7 @@ def rap(debugger, command, result, dict):
 				mo = re.match( r'(.*) = ([^ ]*)', a , re.M|re.I)
 				if mo:
 					line = "f %s = %s\n"%(mo.group(1), mo.group(2))
-					line = "ar %s = %s\n"%(mo.group(1), mo.group(2))
+					line = line + "ar %s = %s\n"%(mo.group(1), mo.group(2))
 					res = res + line
 			#regs = dbg.getRegister("pc")
 			return res

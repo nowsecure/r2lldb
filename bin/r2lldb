@@ -1,6 +1,7 @@
 #!/bin/sh
 
-R2LLDB_VERSION="0.1"
+R2LLDB_VERSION="0.2"
+
 ME=`dirname $0`/r2lldb
 LN=`readlink $ME`
 if [ -n "${LN}" ]; then
@@ -8,9 +9,10 @@ if [ -n "${LN}" ]; then
 else
 	CWD=`dirname ${ME}`/..
 fi
+export PYTHONPATH="${CWD}"
 
 Help() {
-	echo "Usage: r2lldb [-vh] [-l port] [[-p,-c] t] [-|pid|program|host:port]"
+	echo "Usage: r2lldb [-vh] [-l[l] port] [-R] [[-p[p],-c] t] [-|pid|program|host:port]"
 	if [ -n "$1" ]; then
 		echo " -h          show this help message"
 		echo " -l [port]   start debugserver"
@@ -23,7 +25,11 @@ Help() {
 		echo "Example:"
 		echo " target$ r2lldb -l 1234 /bin/ls"
 		echo " host$ r2lldb -p ios localhost:1234"
-		echo " host$ r2lldb -r ios localhost:999"
+		echo " host$ r2lldb -r ios localhost:9999"
+		echo "Local:"
+		echo " host$ export PYTHONPATH=$CWD"
+		echo " host$ r2lldb /bin/ls"
+		echo " host$ r2lldb -R"
 		exit 0
 	fi
 	exit 1
@@ -112,7 +118,7 @@ case "$1" in
 	ios)
 		C="$C -o 'platform select remote-ios'"
 		;;
-	osx)
+	osx|local|unix|linux)
 		: # nothing
 		;;
 	*)
@@ -131,6 +137,9 @@ case "$1" in
 	echo $C
 	eval $C
 	;;
+'-R')
+	$0 -r local localhost:9999
+	;;
 '-r')
 	echo "Launching r2 to connect to rap:// lldb"
 	if [ -z "$2" ]; then
@@ -148,13 +157,13 @@ case "$1" in
 	Help
 	;;
 *)
-	shift
 	if [ -n "`echo '$1' | grep :`" ]; then
 		echo "Connecting to remote lldb..."
 	else
 		echo "Open program: $* .."
 		lldb -s ${CWD}/etc/lldb/local $*
 	fi
+	shift
 	exit 0
 	;;
 esac
