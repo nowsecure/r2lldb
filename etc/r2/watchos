@@ -1,0 +1,20 @@
+# r2lldb script for iPhone
+e asm.os=darwin
+e asm.arch=arm
+e asm.bits=32
+e asm.cmtcol=50
+e asm.bytes=false
+e key.f6=$s
+e key.f7=$so
+(regs,.=!dr*,.dr*)
+(step,=!ds,.=!dr*,.dr*)
+"$s=.(step) 2>/dev/null"
+"$so==!dso;.(regs)"
+$r=.(regs)
+$b==!db
+$bt==!dbt
+$m==!dm
+$c==!dc
+$c==!dc
+$v==!dfv
+$t==!dt

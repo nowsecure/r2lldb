@@ -38,6 +38,14 @@ This is the list of features that r2lldb brings:
 
 Example
 -------
+Start with `XCode` or `ios-deploy` an lldb session in the target process and type:
+
+	(lldb) script del sys.modules["r2lldb"]  # force module reload
+	(lldb) script import r2lldb              # start r2rap server
+
+
+Another Example
+---------------
 
 Target:
 

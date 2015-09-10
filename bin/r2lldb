@@ -1,6 +1,6 @@
 #!/bin/sh
 
-R2LLDB_VERSION="0.2"
+R2LLDB_VERSION="0.3"
 
 ME=`dirname $0`/r2lldb
 LN=`readlink $ME`
@@ -20,16 +20,18 @@ Help() {
 		echo " -p t [h:p]  proxy lldb-debugserver and listen for r2lldb" 
 		echo " -pp t [h:p] lldb->r2 like above, but forever" 
 		echo " -r t [h:p]  connect r2 to an r2lldb rap server (t=ios,osx)" 
+		echo " -R          connect to rap://localhost:9999"
 		echo " -v          show version information"
 		echo " -           python oneliner to run r2lldb server in lldb"
 		echo "Example:"
-		echo " target$ r2lldb -l 1234 /bin/ls"
-		echo " host$ r2lldb -p ios localhost:1234"
-		echo " host$ r2lldb -r ios localhost:9999"
+		echo " (lldb) script import r2lldb          # in lldb shell to start r2rap server"
+		echo " target$ r2lldb -l 1234 /bin/ls       # local debugserver"
+		echo " host$ r2lldb -p ios localhost:1234   # proxy between debugserver and r2rap"
+		echo " host$ r2lldb -r ios localhost:9999   # connect to the rap server"
 		echo "Local:"
 		echo " host$ export PYTHONPATH=$CWD"
-		echo " host$ r2lldb /bin/ls"
-		echo " host$ r2lldb -R"
+		echo " host$ r2lldb /bin/ls                 # start program and wait for r2rap connection"
+		echo " host$ r2lldb -R                      # connect to localhost:9999 rap server"
 		exit 0
 	fi
 	exit 1

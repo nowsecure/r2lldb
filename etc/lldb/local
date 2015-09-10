@@ -1,3 +1,4 @@
 process launch --stop-at-entry
+script del sys.modules["r2lldb"]
 script import r2lldb
 quit

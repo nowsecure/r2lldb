@@ -1,5 +1,5 @@
-platform select remote-ios
+platform select remote-watchos
 process connect connect://192.168.1.34:1234
 script del sys.modules["r2lldb"]
-script import r2lldb
+command script import r2lldb
 quit
