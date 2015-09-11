@@ -6,6 +6,8 @@ except:
 	print
 	raise
 
+import traceback
+
 # (lldb) process launch --stop-at-entry -- -program_arg value 
 
 #from backend import bp
@@ -16,13 +18,67 @@ def cont():
 def run_to_entry():
 	return cmd("run")
 
+def system_cat(path, head=False):
+	ret = ""
+	try:
+		fd = runCode('(void*)open((char*)"'+path+'",0);')
+		print ("FD "+fd)
+		if int(fd,16) == 4294967295:
+			return "Cannot open file"
+		buf = runCode('(void*)malloc((int)10240)')
+		print "open("+buf+")"
+		i = 0
+		while True:
+			de = runCode('(int)read((int)'+str(fd)+',(void*)'+str(buf)+',(int)1024);');
+			count = int (de, 16)
+			print ("read("+str(i)+")="+str(count))
+			try:
+				data = read(int(buf,16), count)
+				ret = ret + str(data)
+			except:
+				traceback.print_last()
+				ret = ret + ".\n"
+			if count != 1024 and count != 0x1024:
+				break
+			if head:
+				break
+			i = i + 1
+	except:
+		traceback.print_last()
+		ret = ret + "ERR\n";
+	cmd('e (void)free((void*)'+buf+')')
+	cmd('e (int)close((int)'+fd+')')
+	return ret
+
+def system_ls(path):
+	ret = ""
+	print ("LS("+path+")")
+	try:
+		ptr = runCode('(void*)opendir((char*)"'+path+'");')
+		if int(ptr,16) == 0:
+			return "Cannot find directory"
+		print "opendir("+ptr+")"
+		while True:
+			de = runCode('(void*)readdir((void*)'+ptr+');');
+			#print ("readdir()="+de)
+			if int(de,16) == 0:
+				break
+			row = cmd('x/1s '+de+'+0x15')
+			print (row.strip())
+			ret = ret + row
+		runCode('(int)closedir((void*)'+ptr+')')
+	except:
+		traceback.print_last()
+		ret = ret + "ERR\n";
+	return ret
+
 def setenv(x,y):
 	# TODO: if process not running
 	# dbg.cmd("set env %s %s"%(a[0],a[1])
-	runC("e (void)setenv(\"%s\",\"%s\",1)"%(x,y))
+	runC("(void)setenv(\"%s\",\"%s\",1)"%(x,y))
 
 def dlopen(x):
-	runC("e (void)dlopen(\"%s\")"%x)
+	runC("(void)dlopen(\"%s\")"%x)
 
 def cmd(x):
 	res = lldb.SBCommandReturnObject()
@@ -64,6 +120,13 @@ def runC(code):
 		if a != '':
 			print(a)
 			cmd("e "+a)
+def runCode(code):
+	res = cmd("e "+code)
+	try:
+		return res.split("=")[1].strip()
+	except:
+		print "EXCEPTION"
+		return res
 
 #  runC("""
 #  (void)sleep(2)
@@ -124,7 +187,7 @@ def read(addr, size):
 		res = target.process.ReadMemory (addr+i, bs, error)
 		if len (res) == 0:
 			print(error)
-			print ("READ FAIL AT 0x%x"%(addr+i))
+			#print ("READ FAIL AT 0x%x"%(addr+i))
 			i = i + bs
 			continue
 		if data == None:
@@ -145,7 +208,7 @@ def write(addr, buf):
 	print (res)
 	if res == 0:
 		print(error)
-		print ("WRITE FAIL AT 0x%x"%(addr+i))
+		#print ("WRITE FAIL AT 0x%x"%(addr+i))
 		return 0
 	return size
 

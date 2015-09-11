@@ -149,8 +149,13 @@ case "$1" in
 		(cd $CWD/etc/r2 ; ls | cat)
 		exit 1
 	fi
+	if [ -z "$3" ]; then
+		HOST="localhost:9999"
+	else
+		HOST="$3"
+	fi
 	if [ -f "$CWD/etc/r2/$2" ]; then
-		r2 -wi "$CWD/etc/r2/$2" rap://"$3"//
+		r2 -wi "$CWD/etc/r2/$2" rap://"$HOST"//
 	else
 		r2 -wn rap://"$3"//
 	fi

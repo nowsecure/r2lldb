@@ -34,7 +34,11 @@ def contains(at):
 def list():
 	s = ""
 	for a in traces.keys():
-		line = "dt 0x%x %s\n"%(int(a,16),traces[a])
+		line = ""
+		try:
+			line = "dt 0x%x %s\n"%(int(a,16),traces[a])
+		except:
+			line = "dt "+a+" "+traces[a] + "\n"
 		s = s + line
 	return s
 	

@@ -43,7 +43,11 @@ def rap(debugger, command, result, dict):
 		elif c == "objc":
 			return dbg.objcListClasses()
 		elif c == "run":
-			return dbg.cmd("run");
+			return dbg.cmd("run")
+		elif c[0:5] == "call ":
+			return dbg.cmd("call "+ c[4:])
+		elif c[0:5] == "lldb ":
+			return dbg.cmd(c[5:])
 		elif c == "dc":
 			return dbg.cont()
 		elif c == "ds":
@@ -57,15 +61,17 @@ def rap(debugger, command, result, dict):
 				res = res + line
 			return res
 		elif c == "i":
-			s = ""
+			print "NAME ERR"
 			#if dbg.isThumb():
 			#	s = s + "e asm.bits=16 # thumb\n"
 			# TODO 
 			#(lldb) target list
 			#Current targets:
 			#* target #0: path-to-bin ( arch=i386-apple-ios, platform=ios-simulator, pid=21617, state=stopped )
-			s = s + cmd("target list")
-			return s
+			try:
+				return cmd("target list")
+			except:
+				return "cmd(target list)\n"
 		elif c == "dbc":
 			return "TODO: dbc"
 		elif c[0:3] == "dt ":
@@ -93,6 +99,22 @@ def rap(debugger, command, result, dict):
 """
 		elif c == "dTc":
 			return loop.runLoop()
+		elif c == "quit":
+			rs.disconnect()
+			del sys.modules["r2lldb"]
+			return "Disconnected. Please Quit\n"
+		elif c[0:3] == "ls ":
+			return dbg.system_ls(c[3:])
+		elif c == "ls":
+			return dbg.system_ls(".")
+		elif c[0:4] == "cat ":
+			return dbg.system_cat(c[4:])
+		elif c == "cat":
+			return "cat: Missing file"
+		elif c[0:5] == "head ":
+			return dbg.system_cat(c[4:], True)
+		elif c == "head":
+			return "head: Missing file"
 		elif c == "dt":
 			return trace.list()
 		elif c == "dcta":
@@ -242,6 +264,10 @@ def rap(debugger, command, result, dict):
 =!i                      # target information
 =!is                     # list symbols
 =!dfv                    # show frame variables (arguments + locals)
+=!ls [path]              # list files from remote device
+=!cat [path]             # show contents of file
+=!call (int)getuid()     # inject and run code in target process
+=!lldb ..command..       # run lldb command
 =!up,down,list           # lldb's command to list select frames and show source
 =!dks                    # stop debugged process
 =!dm                     # show maps (image list)
@@ -265,6 +291,7 @@ def rap(debugger, command, result, dict):
 =!objc                   # list all objc classes
 =!setenv k v             # set variable in target process
 =!dlopen /path/to/lib    # dlopen lib (libr2.so, frida?)
+=!quit                   # quit r2lldb server loop
 """
 		return None
 	port = int(command)
@@ -291,14 +318,17 @@ def rap(debugger, command, result, dict):
 	rs.handle_seek = __seek
 	rs.listen_tcp (port)
 
-import signal
-import sys
-def signal_handler(signal, frame):
-        print('')
-	# TODO: close rap server here
-        sys.exit(0)
-signal.signal(signal.SIGINT, signal_handler)
-#signal.pause()
+def handle_signal():
+	import signal
+	import sys
+	def signal_handler(signal, frame):
+		print('')
+		# TODO: close rap server here
+		sys.exit(0)
+
+	signal.signal(signal.SIGINT, signal_handler)
+	#signal.pause()
+#handle_signal()
 
 PORT = "9999"
 

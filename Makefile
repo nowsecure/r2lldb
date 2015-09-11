@@ -14,7 +14,9 @@ all:
 
 install:
 	ln -fs ${CWD}/bin/r2lldb ${DESTDIR}/${BINDIR}/r2lldb
+	rm -rf ${DESTDIR}/${PYPATH}/r2lldb*
 	ln -fs ${CWD}/r2lldb ${DESTDIR}/${PYPATH}
+	ln -fs ${CWD}/r2lldb ${DESTDIR}/${PYPATH}/r2lldb0${N}
 
 lint:
 	for a in `find r2lldb -iname '*.py'` ; do \
