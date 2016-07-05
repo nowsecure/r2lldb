@@ -1,5 +1,5 @@
 DESTDIR=/
-PREFIX=/usr
+PREFIX=/usr/local
 BINDIR=${PREFIX}/bin
 
 PYPATH=$(shell python -c 'import sys;print sys.path[-1]')
