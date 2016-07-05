@@ -14,6 +14,10 @@ ios ls:
 check:
 	@if [ -z "$(IOS)" ]; then echo "IOS=xxx required" ; false ; fi
 
+mount:
+	hdiutil detach $(DISKIMG) || true
+	hdiutil attach $(SDKROOT)/$(IOS)*/DeveloperDiskImage.dmg
+
 debugserver: check
 	hdiutil detach $(DISKIMG) || true
 	hdiutil attach $(SDKROOT)/$(IOS)*/DeveloperDiskImage.dmg

@@ -40,21 +40,18 @@ class RapServer():
 	# copypasta from client
 	def system(self, cmd):
 		buf = pack(">Bi", RAP_SYSTEM, len(str(cmd)))
-		print("SENDING A RAP SYSTEM QUERY..")
-		self.fd.send(buf+cmd)
+		self.fd.send(buf)
+		self.fd.send(cmd)
 		# read response
-		print("waiting for response..")
 		buf = self.fd.recv(5)
 		(c,l) = unpack(">Bi", buf)
 		if c != RAP_SYSTEM | RAP_REPLY:
-			print("rmt-system: Invalid response packet %x"%c)
+			print "rmt-system: Invalid response packet"
 			return ""
-		print ("processing output %d"%l)
 		if l>0:
 			buf = self.fd.recv(l)
 		else:
 			buf = ""
-		print("RES IS %s"%buf)
 		return buf
 
 	def _handle_packet(self, c, key):
@@ -73,34 +70,29 @@ class RapServer():
 			buf = c.recv(4)
 			(length,) = unpack(">I", buf)
 			if self.handle_read != None:
-				ret = str(self.handle_read(length))
 				try:
+					ret = str(self.handle_read(length))
 					lon = len(ret)
 				except:
 					ret = ""
 					lon = 0
 			else:
+				print "PUTAA"
 				ret = ""
 				lon = 0;
-			buf = pack(">Bi", key|RAP_REPLY, lon)
+			print "PACKING REPLY"
+			buf = pack(">Bi", key | RAP_REPLY, lon)
+			print "SENDING RAP READ"
 			c.send(buf+ret)
 		elif key == RAP_WRITE:
 			buf = c.recv(4)
 			(length,) = unpack(">I", buf)
 			buf = c.recv(length)
-			print ("HANDLE WRITE %d"%key)
-			print ("HANDLE WRITE %d"%len(buf))
-			# TODO: get buf and length
-			try:
-				if self.handle_write != None:
-					length = self.handle_write (buf)
-				buf = pack(">Bi", key|RAP_REPLY, length)
-				c.send(buf)
-			except:
-				print sys.exc_info()
-				print "ERROR"
-				buf = pack(">Bi", key|RAP_REPLY, 0)
-				c.send(buf)
+			# TODO: get buffer and length
+			if self.handle_write != None:
+				length = self.handle_write (buf)
+			buf = pack(">Bi", key|RAP_REPLY, length)
+			c.send(buf)
 		elif key == RAP_SEEK:
 			buf = c.recv(9)
 			(type, off) = unpack(">BQ", buf)
@@ -158,7 +150,6 @@ class RapServer():
 
 	def listen_tcp(self, port):
 		s = socket();
-		s.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 		s.bind(("0.0.0.0", port))
 		s.listen(999)
 		print("Listening at port %d"%port)
