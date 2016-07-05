@@ -35,6 +35,19 @@ This is the list of features that r2lldb brings:
 * Change process environment variables
 * Run r2 commands on every traced breakpoint
 
+Local example
+-------------
+
+Using r2 as a frontend for local lldb is as easy as this:
+
+	$ r2lldb /bin/ls
+
+Then in another terminal:
+
+	$ r2lldb -R localhost:9999
+
+The same syntax applies to remote connections or crossplatform ones.
+
 
 Example
 -------
