@@ -13,9 +13,10 @@ all:
 	-pkill lldb
 
 install:
-	ln -fs ${CWD}/bin/r2lldb ${DESTDIR}/${BINDIR}/r2lldb
-	rm -rf ${DESTDIR}/${PYPATH}/r2lldb*
-	ln -fs ${CWD}/r2lldb ${DESTDIR}/${PYPATH}/r2lldb
+	ln -fs "${CWD}/bin/r2lldb" "${DESTDIR}/${BINDIR}"/r2lldb
+	rm -rf "${DESTDIR}/${PYPATH}"/r2lldb*
+	mkdir -p "${DESTDIR}/${PYPATH}"/r2lldb*
+	ln -fs "${CWD}/r2lldb" "${DESTDIR}/${PYPATH}/r2lldb"
 
 uninstall:
 	rm -f ${DESTDIR}/${BINDIR}/r2lldb
