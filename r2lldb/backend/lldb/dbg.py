@@ -210,7 +210,7 @@ def write(addr, buf):
 		print(error)
 		#print ("WRITE FAIL AT 0x%x"%(addr+i))
 		return 0
-	return size
+	return res
 
 #[ 99] 29886CD7-2AC8-3578-8389-7D5BEE405F53 0x08a38000 /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/PrivateFrameworks/FaceCore.framework/FaceCore 
 

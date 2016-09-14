@@ -21,6 +21,8 @@ def run_script(file):
 def rap(debugger, command, result, dict):
 	def r2cmd(c):
 		print ("_____(%s)___"%c)
+		if c == "":
+			return
 		if c[0:2] == ". ":
 			return run_script(c[2:])
 		if c[0] == ":":
