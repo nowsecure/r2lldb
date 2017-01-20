@@ -1,7 +1,10 @@
 r2lldb
 ======
 
-radare2-lldb integration
+radare2-(lldb|gdb) integration
+
+Description
+-----------
 
 This repository contains all the necessary scripts required to debug
 and manipulate anything running behind an LLDB the LLVM debugger from
@@ -16,7 +19,6 @@ obtained by using the `viatools/salvarez/ios-debugserver` repository.
 
 In theory it shuold be possible to use r2lldb on Linux and debug
 Android devices running gdbserver, but this hasn't been tested yet.
-
 
 Features
 --------
@@ -118,3 +120,34 @@ r2lldb's help from r2
 	=!objc                   # list all objc classes
 	=!setenv k v             # set variable in target process
 	=!dlopen /path/to/lib    # dlopen lib (libr2.so, frida?)
+
+GDB notes
+---------
+
+Recently, this project got the ability to use `gdb` as target for r2,
+so the project name will probably change to make this clear.
+
+In order to run r2lldb in `ndk-gdb` you may do the following:
+
+	$ prebuilt/darwin-x86_64/bin/gdb
+	(gdb) python-interactive
+	>>> import sys
+	>>> sys.path.append('/path/to/r2lldb')
+	>>> sys.path.append('/path/to/radare2-r2pipe/python')
+	>>> import r2lldb
+
+In another terminal:
+
+	$ r2 rap://localhost:9999
+
+Android
+-------
+
+To debug Android apps in the target device you will need to find a copy of the `gdbserver` binary. which can be found in Termux if you install the `gdb` package, but also, it can be found inside the NDK under the `prebuilt/` directory.
+
+iOS
+---
+
+The `debugserver` is deployed by XCode in the debugger image. If you have a jailbroken device you can just extract this binary from the dmg and copy it via SSH.
+
+--pancake

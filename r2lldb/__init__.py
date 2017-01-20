@@ -6,8 +6,12 @@
 # command script import /Users/pancake/prg/nowsecure/r2lldb/main.py
 
 from r2rap import RapServer
-from backend.lldb import dbg
-from backend.lldb import loop
+try:
+	from backend.lldb import dbg
+	from backend.lldb import loop
+except:
+	from backend.gdb import dbg
+	from backend.gdb import loop
 from backend import trace
 import exceptions
 import traceback
@@ -50,6 +54,8 @@ def rap(debugger, command, result, dict):
 			return dbg.cmd("call "+ c[4:])
 		elif c[0:5] == "lldb ":
 			return dbg.cmd(c[5:])
+		elif c[0:4] == "gdb ":
+			return dbg.cmd(c[4:])
 		elif c == "dc":
 			return dbg.cont()
 		elif c == "ds":
