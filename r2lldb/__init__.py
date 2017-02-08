@@ -13,7 +13,10 @@ except:
 	from backend.gdb import dbg
 	from backend.gdb import loop
 from backend import trace
-import exceptions
+try:
+   from exceptions import *
+except:
+   pass
 import traceback
 import r2pipe
 import sys
@@ -69,7 +72,7 @@ def rap(debugger, command, result, dict):
 				res = res + line
 			return res
 		elif c == "i":
-			print "NAME ERR"
+			print ("NAME ERR")
 			#if dbg.isThumb():
 			#	s = s + "e asm.bits=16 # thumb\n"
 			# TODO 
@@ -245,7 +248,7 @@ def rap(debugger, command, result, dict):
 				#s = s.split("\n").join(" ")
 				return s #s.split("\n").join(" ") + "\n"
 			except:
-				print "ERRER"
+				print("ERRER")
 				return "ERROR"
 		elif c == "dr":
 			return dbg.cmd('reg read')
@@ -344,10 +347,10 @@ PORT = "9999"
 def main():
 	try:
 		rap(0, PORT, "", "")
-	except exceptions.SystemExit:
+	except SystemExit:
 		pass
 	except:
-		print "Unexpected error:", sys.exc_info()[0]
+		print("Unexpected error:", sys.exc_info()[0])
 		print("Rap exception cannot listen")
 
 # Register r2rap command in the lldb shell

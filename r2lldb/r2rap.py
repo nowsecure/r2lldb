@@ -46,7 +46,7 @@ class RapServer():
 		buf = self.fd.recv(5)
 		(c,l) = unpack(">Bi", buf)
 		if c != RAP_SYSTEM | RAP_REPLY:
-			print "rmt-system: Invalid response packet"
+			print("rmt-system: Invalid response packet")
 			return ""
 		if l>0:
 			buf = self.fd.recv(l)
@@ -77,12 +77,12 @@ class RapServer():
 					ret = ""
 					lon = 0
 			else:
-				print "PUTAA"
+				print("PUTAA")
 				ret = ""
 				lon = 0;
-			print "PACKING REPLY"
+			print("PACKING REPLY")
 			buf = pack(">Bi", key | RAP_REPLY, lon)
-			print "SENDING RAP READ"
+			print("SENDING RAP READ")
 			c.send(buf+ret)
 		elif key == RAP_WRITE:
 			buf = c.recv(4)
@@ -142,7 +142,7 @@ class RapServer():
 					self.handle_eof(c)
 					break
 				if len(buf) == 0:
-					print "Connection closed\n"
+					print("Connection closed\n")
 					break
 				self._handle_packet(c, ord(buf))
 			except KeyboardInterrupt:
@@ -156,7 +156,7 @@ class RapServer():
 		self.running = True
 		while self.running:
 			(c, (addr,port)) = s.accept()
-			print "New client %s:%d"%(addr,port)
+			print("New client %s:%d"%(addr,port))
 			self._handle_client(c)
 
 	def stop(self):
@@ -188,7 +188,7 @@ class RapClient():
 		buf = self.fd.recv(5)
 		(c,l) = unpack(">Bi", buf)
 		if c != (RAP_REPLY|RAP_OPEN):
-			print "rmt-open: Invalid response packet 0x%02x"%c
+			print("rmt-open: Invalid response packet 0x%02x"%c)
 		return l
 
 	def read(self, count):
@@ -209,7 +209,7 @@ class RapClient():
 		buf = self.fd.recv(5)
 		(c,l) = unpack(">Bi", buf)
 		if c != (RAP_REPLY|RAP_WRITE):
-			print "rmt-write: Invalid response packet 0x%02x"%c
+			print("rmt-write: Invalid response packet 0x%02x"%c)
 
 	def lseek(self, type, addr):
 		# WTF BBQ?
@@ -228,7 +228,7 @@ class RapClient():
 		buf = self.fd.recv(5)
 		(c,l) = unpack(">Bi", buf)
 		if c != RAP_REPLY | RAP_CLOSE:
-			print "rmt-close: Invalid response packet"
+			print("rmt-close: Invalid response packet")
 
 	def cmd(self, cmd):
 		buf = pack(">Bi", RAP_CMD, len(str(cmd)))
@@ -237,8 +237,8 @@ class RapClient():
 		buf = self.fd.recv(5)
 		(c,l) = unpack(">Bi", buf)
 		if c != RAP_CMD | RAP_REPLY:
-			print c
-			print "rmt-cmd: Invalid response packet"
+			print(c)
+			print("rmt-cmd: Invalid response packet")
 			return ""
 		buf = ""
 		if l>0:
@@ -257,7 +257,7 @@ class RapClient():
 		buf = self.fd.recv(5)
 		(c,l) = unpack(">Bi", buf)
 		if c != RAP_SYSTEM | RAP_REPLY:
-			print "rmt-system: Invalid response packet"
+			print("rmt-system: Invalid response packet")
 			return ""
 		if l>0:
 			buf = self.fd.recv(l)
