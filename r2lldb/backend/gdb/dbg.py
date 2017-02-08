@@ -1,9 +1,9 @@
 try:
 	import gdb
 except:
-	print
-	print "ERROR: import gdb only works in the gdb shell"
-	print
+	print("")
+	print("ERROR: import gdb only works in the gdb shell")
+	print("")
 	raise
 
 import traceback
@@ -25,7 +25,7 @@ def system_cat(path, head=False):
 		if int(fd,16) == 4294967295:
 			return "Cannot open file"
 		buf = runCode('(void*)malloc((int)10240)')
-		print "open("+buf+")"
+		print("open("+buf+")")
 		i = 0
 		while True:
 			de = runCode('(int)read((int)'+str(fd)+',(void*)'+str(buf)+',(int)1024);');
@@ -56,7 +56,7 @@ def system_ls(path):
 		ptr = runCode('(void*)opendir((char*)"'+path+'");')
 		if int(ptr,16) == 0:
 			return "Cannot find directory"
-		print "opendir("+ptr+")"
+		print("opendir("+ptr+")")
 		while True:
 			de = runCode('(void*)readdir((void*)'+ptr+');');
 			#print ("readdir()="+de)
@@ -122,7 +122,7 @@ def runCode(code):
 	try:
 		return res.split("=")[1].strip()
 	except:
-		print "EXCEPTION"
+		print("EXCEPTION")
 		return res
 
 #  runC("""
@@ -332,9 +332,9 @@ def parseCPSR(frame):
 		cpsr = [reg for reg in regs if reg.GetName()=='cpsr'][0]
 		thumb_bit = int(cpsr.GetValue(), 16) & 0x20
 		if thumb_bit >> 5 != 0:
-			print "5: thumb"
+			print("5: thumb")
 		else:
-			print "5: arm"
+			print("5: arm")
 		return True
 	except:
 		pass

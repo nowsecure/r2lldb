@@ -133,7 +133,9 @@ In order to run r2lldb in `ndk-gdb` you may do the following:
 	(gdb) python-interactive
 	>>> import sys
 	>>> sys.path.append('/path/to/r2lldb')
-	>>> sys.path.append('/path/to/radare2-r2pipe/python')
+	>>> sys.path.append('/path/to/r2lldb/r2lldb')
+	>>> sys.path.append('/path/to/r2lldb/r2lldb/backend/gdb/')
+	>>> sys.path.append('/path/to/radare2-r2pipe/python/')
 	>>> import r2lldb
 
 In another terminal:

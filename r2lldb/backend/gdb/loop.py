@@ -1,9 +1,9 @@
 try:
 	import gdb
 except:
-	print
-	print "ERROR: import gdb only works in the gdb shell"
-	print
+	print("")
+	print("ERROR: import gdb only works in the gdb shell")
+	print("")
 	raise
 
 import time
@@ -12,7 +12,7 @@ import dbg
 dead = False
 running = False
 traces = []
-print "LOOP INIT"
+print("LOOP INIT")
 
 def memWrite(addr, buf):
 	data = ''
@@ -52,9 +52,9 @@ def setTracepoint(symname):
 		return None
 	a.addr = addr
 	res = cmd("breakpoint set -a %s"%(addr))
-	print res
+	print(res)
 	traces.append(a)
-	print "SET TRACE %s at %s"%(symname, a.addr)
+	print("SET TRACE %s at %s"%(symname, a.addr))
 	return a
 # 	try:
 # 		a.addr = res.split("= ")[2].split("\n")[0]
@@ -86,7 +86,7 @@ def getCurrentPC():
 
 def mainLoop():
 	global dead, running
-	print time.time()
+	print(time.time())
 	if not running:
 		running = True
 		o=cmd("run")
@@ -96,7 +96,7 @@ def mainLoop():
 		print ("IS DEAD")
 		dead = True
 	print (o)
-	print time.time()
+	print(time.time())
 	pc = getCurrentPC()
 	if not pc:
 		dead = True
@@ -107,7 +107,7 @@ def mainLoop():
 		if hasattr(t, "cmd"):
 			print ("RUNNING COMMAND")
 			t.cmd ()
-	print "STOP AT (%s)"%(pc)
+	print("STOP AT (%s)"%(pc))
 
 # ERR
 # XXX. this must be defined by the user or something
@@ -119,12 +119,12 @@ RETADDR="0x1000bb484"
 def PatchReturn0():
 	cmd("register write rax 0")
 	cmd("register write rip %s"%(RETADDR))
-	print "PATCHED RETURN VALUE TO 0"
+	print("PATCHED RETURN VALUE TO 0")
 
 def PatchReturn1():
 	cmd("register write rax 1")
 	cmd("register write rip %s"%(RETADDR))
-	print "PATCHED RETURN VALUE TO 1"
+	print("PATCHED RETURN VALUE TO 1")
 
 #t = setTracepoint("strcmp")
 #t.cmd = PatchReturn0
