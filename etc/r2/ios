@@ -2,7 +2,7 @@
 e asm.os=darwin
 e asm.arch=arm
 e asm.bits=64
-e asm.cmtcol=50
+e asm.cmt.col=50
 e asm.bytes=false
 e key.f6=$s
 e key.f7=$so
